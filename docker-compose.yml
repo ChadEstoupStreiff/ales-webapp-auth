@@ -61,17 +61,18 @@ services:
     networks:
       - resa-network
 
-  # resa_soap:
-  #   build:
-  #     context: soap
-  #   env_file:
-  #     - .env
-  #   container_name: resa_soap
-  #   restart: always
-  #   ports:
-  #     - ${SOAP_PORT}:80
-  #   networks:
-  #     - resa-network
+      
+  resa_grpc:
+    build:
+      context: grpc
+    env_file:
+      - .env
+    container_name: resa_grpc
+    restart: always
+    ports:
+      - ${GRPC_PORT}:8080
+    networks:
+      - resa-network
 
 networks:
   resa-network:
