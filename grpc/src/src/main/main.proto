@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+package reservation;
+
+// The hotel reservation service definition
+service HotelReservation {
+  // Reserve a hotel room
+  rpc ReserveHotel (HotelRequest) returns (HotelResponse);
+}
+
+// The flight reservation service definition
+service FlightReservation {
+  // Reserve a flight
+  rpc ReserveFlight (FlightRequest) returns (FlightResponse);
+}
+
+// Request message for hotel reservation
+message HotelRequest {
+  string hotel_id = 1;
+  string user_id = 2;
+  string check_in_date = 3;
+  string check_out_date = 4;
+  int32 number_of_rooms = 5;
+}
+
+// Response message for hotel reservation
+message HotelResponse {
+  string reservation_id = 1;
+  bool success = 2;
+  string message = 3;
+}
+
+// Request message for flight reservation
+message FlightRequest {
+  string flight_id = 1;
+  string user_id = 2;
+  string departure_date = 3;
+  string return_date = 4;
+  int32 number_of_tickets = 5;
+}
+
+// Response message for flight reservation
+message FlightResponse {
+  string reservation_id = 1;
+  bool success = 2;
+  string message = 3;
+}
