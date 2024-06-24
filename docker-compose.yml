@@ -1,0 +1,43 @@
+version: '3'
+
+services:
+  resa_front:
+    build:
+      context: front
+    env_file:
+      - .env
+    container_name: resa_front
+    restart: always
+    ports:
+      - ${APP_PORT}:80
+    networks:
+      - resa-network
+
+  resa_backend:
+    build:
+      context: back
+    env_file:
+      - .env
+    container_name: resa_backend
+    restart: always
+    ports:
+      - ${BACK_PORT}:80
+    networks:
+      - resa-network
+
+  # resa_soap:
+  #   build:
+  #     context: soap
+  #   env_file:
+  #     - .env
+  #   container_name: resa_soap
+  #   restart: always
+  #   ports:
+  #     - ${SOAP_PORT}:80
+  #   networks:
+  #     - resa-network
+
+networks:
+  resa-network:
+    name: resa-network
+    driver: bridge
