@@ -1,49 +1,37 @@
 version: '3'
 
 services:
-  resa_keycloak:
-    image: quay.io/keycloak/keycloak:23.0.7
-    env_file:
-      - .env
-    container_name: resa_keycloack
-    environment:
-      KC_PROXY_HEADERS: forwarded
-
-      KC_DB: postgres
-      KC_DB_URL: jdbc:postgresql://resa_keycloak_db:5432/keycloak
-      KC_DB_USERNAME: ${KC_DB_USERNAME}
-      KC_DB_PASSWORD: ${KC_DB_PASSWORD}
-
-      KC_HOSTNAME: localhost
-      KC_HOSTNAME_PORT: 8080
-      KC_HOSTNAME_STRICT: false
-      KC_HOSTNAME_STRICT_HTTPS: false
-
-      KC_LOG_LEVEL: debug
-      KC_METRICS_ENABLED: true
-      KC_HEALTH_ENABLED: true
-      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
-      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
-    command: start-dev
-    depends_on:
-      - resa_keycloak_db
-    ports:
-      - ${KC_PORT}:8080
-    networks:
-      - resa-network
-
-  resa_keycloak_db:
-    image: postgres:15
-    env_file:
-      - .env
-    container_name: resa_keycloack_db
-    volumes:
-      - ./data/kc_db:/var/lib/postgresql/data
+  postgres:
+    image: postgres:15.7-alpine
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "keycloak"]
     environment:
       POSTGRES_DB: keycloak
       POSTGRES_USER: ${KC_DB_USERNAME}
       POSTGRES_PASSWORD: ${KC_DB_PASSWORD}
-    hostname: resa_keycloak_db
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    hostname: kc_postgres
+    networks:
+      - resa-network
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:25.0.1
+    command: ["start-dev", "--import-realm"]
+    restart: unless-stopped
+    environment:
+      KC_DB: postgres
+      KC_DB_USERNAME: ${KC_DB_USERNAME}
+      KC_DB_PASSWORD: ${KC_DB_PASSWORD}
+      KC_DB_URL: "jdbc:postgresql://kc_postgres:5432/keycloak"
+      KC_METRICS_ENABLED: true
+      KC_LOG_LEVEL: ${KC_LOG_LEVEL}
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+    ports:
+      - ${KC_PORT}:8080
+    hostname: keycloak
     networks:
       - resa-network
 
