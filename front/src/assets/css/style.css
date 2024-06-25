@@ -6,6 +6,12 @@ body {
     text-align: center;
 }
 
+hr {
+    width: 0;
+    height: 0;
+    margin: 20px 0;
+}
+
 header {
     padding: 10px;
 
@@ -27,7 +33,7 @@ h1 {
 
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: start;
     flex-direction: row;
     flex-wrap: wrap;
 }
@@ -44,4 +50,57 @@ h1 {
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
+}
+
+#flights_list, #hotels_list {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#flights_list p, #hotels_list p {
+    margin: 0;
+}
+
+label {
+    margin: 4px;
+}
+
+
+.button-63 {
+    margin: 10px;
+    align-items: center;
+    background-image: linear-gradient(144deg,#AF40FF, #5B42F3 50%,#00DDEB);
+    border: 0;
+    border-radius: 10px;
+    box-shadow: rgba(151, 65, 252, 0.2) 0 15px 30px -5px;
+    box-sizing: border-box;
+    color: #FFFFFF;
+    display: flex;
+    font-family: Phantomsans, sans-serif;
+    font-size: 15px;
+    justify-content: center;
+    line-height: 1em;
+    max-width: 100%;
+    min-width: 140px;
+    padding: 7px 10px;
+    text-decoration: none;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.button-63:active,
+.button-63:hover {
+  outline: 0;
+}
+
+@media (min-width: 768px) {
+  .button-63 {
+    font-size: 15px;
+    min-width: 196px;
+  }
 }

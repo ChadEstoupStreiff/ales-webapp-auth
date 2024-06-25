@@ -71,6 +71,7 @@ services:
     restart: always
     ports:
       - ${GRPC_PORT}:8080
+    hostname: resa_grpc
     networks:
       - resa-network
 

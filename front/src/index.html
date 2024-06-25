@@ -25,21 +25,26 @@
         </div>
         <div class="card">
             <h1>Reserve</h1>
-            <p>
-                <
-            </p>
+            <hr>
+            <label for="flight_id">Reserve a flight:</label>
+            <input type="text" id="flight_id" name="flight_id" required minlength="4" maxlength="12" />
+            <button id="flight_reserve" class="button-63">Reserve this flight ID</button>
+            <hr>
+            <label for="hotel_id">Reserve a hotel:</label>
+            <input type="text" id="hotel_id" name="hotel_id" required minlength="4" maxlength="12" />
+            <button id="hotel_reserve" class="button-63">Reserve this hotel ID</button>
         </div>
         <div class="card">
             <h1>Hotels</h1>
-            <p>
+            <div id="hotels_list">
                 <span class="loader"></span>
-            </p>
+            </div>
         </div>
         <div class="card">
             <h1>Flights</h1>
-            <p>
+            <div id="flights_list">
                 <span class="loader"></span>
-            </p>
+            </div>
         </div>
     </div>
 

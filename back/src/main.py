@@ -1,14 +1,17 @@
 import datetime
 import logging
 
+import grpc
 import jwt
+import main_pb2 as reservation_pb2
+import main_pb2_grpc as reservation_pb2_grpc
 import requests
 from dotenv import dotenv_values
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 app = FastAPI()
 
 app.add_middleware(
@@ -84,20 +87,20 @@ async def get_token(token: str = Depends(oauth2_scheme)):
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token"
         )
 
-def get_current_user(token: str = Depends(oauth2_scheme)):
+
+def get_current_user(token: str):
     try:
         payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
         return payload
     except jwt.ExpiredSignatureError:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token has expired"
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Token has expired"
         )
     except jwt.InvalidTokenError:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid token"
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token"
         )
+
 
 ###############################
 #         Endpoints           #
@@ -107,6 +110,26 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
 @app.get("/hotels/reservations", tags=["Hotel"])
 async def get_hotels_reservations(token: str = Depends(oauth2_scheme)):
     user = get_current_user(token)
+
+    with grpc.insecure_channel("resa_grpc:8080") as channel:
+        hotel_stub = reservation_pb2_grpc.HotelReservationStub(channel)
+
+        hotel_request = reservation_pb2.ListHotelsRequest(
+            user_id=user["sub"],
+        )
+        hotels_response = hotel_stub.ListReservedHotels(hotel_request)
+
+        hotels = [
+            {
+                "hotel_id": hotel.hotel_id,
+                "user_id": hotel.user_id,
+                "check_in_date": hotel.check_in_date,
+                "check_out_date": hotel.check_out_date,
+                "number_of_rooms": hotel.number_of_rooms,
+            }
+            for hotel in hotels_response.hotels
+        ]
+        return hotels
     return None
 
 
@@ -116,19 +139,58 @@ async def add_hotels_reservation(
     token: str = Depends(oauth2_scheme),
 ):
     user = get_current_user(token)
-    return None
+
+    with grpc.insecure_channel("resa_grpc:8080") as channel:
+        hotel_stub = reservation_pb2_grpc.HotelReservationStub(channel)
+
+        hotel_request = reservation_pb2.HotelRequest(
+            hotel_id=hotel,
+            user_id=user["sub"],
+        )
+
+        hotel_stub.ReserveHotel(hotel_request)
+    return True
 
 
-@app.post("/flies/reservations", tags=["Fly"])
-async def get_flies_reservations(token: str = Depends(oauth2_scheme)):
+@app.get("/flights/reservations", tags=["Flight"])
+async def get_flights_reservations(token: str = Depends(oauth2_scheme)):
     user = get_current_user(token)
+
+    with grpc.insecure_channel("resa_grpc:8080") as channel:
+        flight_stub = reservation_pb2_grpc.FlightReservationStub(channel)
+
+        flight_request = reservation_pb2.ListFlightsRequest(
+            user_id=user["sub"],
+        )
+        flights_response = flight_stub.ListReservedFlights(flight_request)
+
+        flights = [
+            {
+                "flight_id": flight.flight_id,
+                "departure_date": flight.departure_date,
+                "return_date": flight.return_date,
+                "number_of_tickets": flight.number_of_tickets,
+            }
+            for flight in flights_response.flights
+        ]
+        return flights
     return None
 
 
-@app.post("/flies/reserve", tags=["Fly"])
-async def add_flies_reservation(
-    fly: str,
+@app.post("/flights/reserve", tags=["Flight"])
+async def add_flights_reservation(
+    flight: str,
     token: str = Depends(oauth2_scheme),
 ):
     user = get_current_user(token)
-    return None
+
+    with grpc.insecure_channel("resa_grpc:8080") as channel:
+        flight_stub = reservation_pb2_grpc.FlightReservationStub(channel)
+
+        flight_request = reservation_pb2.FlightRequest(
+            flight_id=flight,
+            user_id=user["sub"],
+        )
+
+        flight_stub.ReserveFlight(flight_request)
+    return True

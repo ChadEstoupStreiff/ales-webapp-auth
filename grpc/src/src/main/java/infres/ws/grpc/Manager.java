@@ -20,11 +20,11 @@ public class Manager {
         return instance;
     }
 
-    private ArrayList<Main.FlightReservationInfo> flights;
-    private ArrayList<Main.HotelReservationInfo> hotels;
+    private ArrayList<Main.FlightReservationInfo> flights = new ArrayList<>();
+    private ArrayList<Main.HotelReservationInfo> hotels = new ArrayList<>();
 
-    private HashMap<String, ArrayList<String>> reservationsFlights;
-    private HashMap<String, ArrayList<String>> reservationsHotels;
+    private HashMap<String, ArrayList<String>> reservationsFlights = new HashMap<>();
+    private HashMap<String, ArrayList<String>> reservationsHotels = new HashMap<>();
 
 
     public boolean reserverFlight(String user, String flight) {
@@ -58,7 +58,7 @@ public class Manager {
 
         ArrayList<String> hotels = reservationsHotels.getOrDefault(user, new ArrayList<>());
         hotels.add(hotel);
-        reservationsFlights.put(user, hotels);
+        reservationsHotels.put(user, hotels);
         return true;
     }
 
