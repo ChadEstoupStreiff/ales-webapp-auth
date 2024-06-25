@@ -1,0 +1,16 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    width: 100vw;
+    height: 7vh;
+
+    background-color: lightgray;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items:center;
+}
