@@ -8,6 +8,9 @@ import reservation.FlightReservationGrpc;
 import reservation.HotelReservationGrpc;
 import reservation.Main;
 
+import java.util.List;
+import java.util.UUID;
+
 public class ReservationServer {
     public static void main(String[] args) throws Exception {
         Server server = ServerBuilder.forPort(8080)
@@ -24,12 +27,16 @@ public class ReservationServer {
 class HotelReservationServiceImpl extends HotelReservationGrpc.HotelReservationImplBase {
     @Override
     public void reserveHotel(Main.HotelRequest req, StreamObserver<Main.HotelResponse> responseObserver) {
-        Main.HotelResponse response = Main.HotelResponse.newBuilder()
-                .setReservationId("12345")
-                .setSuccess(true)
-                .setMessage("Reservation successful")
-                .build();
-        responseObserver.onNext(response);
+        responseObserver.onNext(Main.HotelResponse.newBuilder()
+                .setReservationId(UUID.randomUUID().toString())
+                .setSuccess(Manager.getInstance().reserverHotel(req.getUserId(), req.getHotelId()))
+                .build());
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void listReservedHotels(Main.ListHotelsRequest req, StreamObserver<Main.ListHotelsResponse> responseObserver) {
+        responseObserver.onNext(Main.ListHotelsResponse.newBuilder().addAllHotels(Manager.getInstance().getHotels(req.getUserId())).build());
         responseObserver.onCompleted();
     }
 }
@@ -37,12 +44,16 @@ class HotelReservationServiceImpl extends HotelReservationGrpc.HotelReservationI
 class FlightReservationServiceImpl extends FlightReservationGrpc.FlightReservationImplBase {
     @Override
     public void reserveFlight(Main.FlightRequest req, StreamObserver<Main.FlightResponse> responseObserver) {
-        Main.FlightResponse response = Main.FlightResponse.newBuilder()
-                .setReservationId("54321")
-                .setSuccess(true)
-                .setMessage("Reservation successful")
-                .build();
-        responseObserver.onNext(response);
+        responseObserver.onNext(Main.FlightResponse.newBuilder()
+                .setReservationId(UUID.randomUUID().toString())
+                .setSuccess(Manager.getInstance().reserverFlight(req.getUserId(), req.getFlightId()))
+                .build());
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void listReservedFlights(Main.ListFlightsRequest req, StreamObserver<Main.ListFlightsResponse> responseObserver) {
+        responseObserver.onNext(Main.ListFlightsResponse.newBuilder().addAllFlights(Manager.getInstance().getFlights(req.getUserId())).build());
         responseObserver.onCompleted();
     }
 }

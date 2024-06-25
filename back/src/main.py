@@ -105,19 +105,14 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
 
 
 @app.get("/hotels/reservations", tags=["Hotel"])
-async def get_hotels_reservations(user: str, token: str = Depends(oauth2_scheme)):
+async def get_hotels_reservations(token: str = Depends(oauth2_scheme)):
     user = get_current_user(token)
     return None
 
 
 @app.post("/hotels/reserve", tags=["Hotel"])
 async def add_hotels_reservation(
-    user: str,
     hotel: str,
-    check_in: datetime.datetime,
-    check_out: datetime.datetime,
-    nbr_room: int,
-    nbr_people: int,
     token: str = Depends(oauth2_scheme),
 ):
     user = get_current_user(token)
@@ -125,17 +120,14 @@ async def add_hotels_reservation(
 
 
 @app.post("/flies/reservations", tags=["Fly"])
-async def get_flies_reservations(user: str, token: str = Depends(oauth2_scheme)):
+async def get_flies_reservations(token: str = Depends(oauth2_scheme)):
     user = get_current_user(token)
     return None
 
 
 @app.post("/flies/reserve", tags=["Fly"])
 async def add_flies_reservation(
-    user: str,
     fly: str,
-    departure: datetime.datetime,
-    nbr_tickets: int,
     token: str = Depends(oauth2_scheme),
 ):
     user = get_current_user(token)

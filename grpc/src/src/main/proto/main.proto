@@ -20,7 +20,6 @@ message HotelRequest {
 message HotelResponse {
   string reservation_id = 1;
   bool success = 2;
-  string message = 3;
 }
 
 message ListHotelsRequest {
@@ -47,7 +46,6 @@ message FlightRequest {
 message FlightResponse {
   string reservation_id = 1;
   bool success = 2;
-  string message = 3;
 }
 
 message ListFlightsRequest {
