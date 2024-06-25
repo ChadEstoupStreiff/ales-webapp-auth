@@ -8,12 +8,6 @@ import reservation.FlightReservationGrpc;
 import reservation.HotelReservationGrpc;
 import reservation.Main;
 
-
-/**
- * Hello world!
- *
- */
-
 public class ReservationServer {
     public static void main(String[] args) throws Exception {
         Server server = ServerBuilder.forPort(8080)
@@ -51,5 +45,10 @@ class FlightReservationServiceImpl extends FlightReservationGrpc.FlightReservati
         responseObserver.onNext(response);
         responseObserver.onCompleted();
     }
+}
+
+class company {
+    public int id;
+    public String name;
 }
 

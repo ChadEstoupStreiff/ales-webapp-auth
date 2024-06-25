@@ -4,18 +4,17 @@ package reservation;
 
 service HotelReservation {
   rpc ReserveHotel (HotelRequest) returns (HotelResponse);
+  rpc ListReservedHotels (ListHotelsRequest) returns (ListHotelsResponse);
 }
 
 service FlightReservation {
   rpc ReserveFlight (FlightRequest) returns (FlightResponse);
+  rpc ListReservedFlights (ListFlightsRequest) returns (ListFlightsResponse);
 }
 
 message HotelRequest {
   string hotel_id = 1;
   string user_id = 2;
-  string check_in_date = 3;
-  string check_out_date = 4;
-  int32 number_of_rooms = 5;
 }
 
 message HotelResponse {
@@ -24,16 +23,45 @@ message HotelResponse {
   string message = 3;
 }
 
+message ListHotelsRequest {
+  string user_id = 1;
+}
+
+message ListHotelsResponse {
+  repeated HotelReservationInfo hotels = 1;
+}
+
+message HotelReservationInfo {
+  string hotel_id = 1;
+  string user_id = 2;
+  string check_in_date = 3;
+  string check_out_date = 4;
+  int32 number_of_rooms = 5;
+}
+
 message FlightRequest {
   string flight_id = 1;
   string user_id = 2;
-  string departure_date = 3;
-  string return_date = 4;
-  int32 number_of_tickets = 5;
 }
 
 message FlightResponse {
   string reservation_id = 1;
   bool success = 2;
   string message = 3;
+}
+
+message ListFlightsRequest {
+  string user_id = 1;
+}
+
+message ListFlightsResponse {
+  repeated FlightReservationInfo flights = 1;
+}
+
+message FlightReservationInfo {
+  string flight_id = 1;
+  string reservation_id = 2;
+  string departure_date = 3;
+  string return_date = 4;
+  int32 number_of_tickets = 5;
 }

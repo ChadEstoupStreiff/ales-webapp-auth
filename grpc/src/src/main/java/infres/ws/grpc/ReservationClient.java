@@ -37,6 +37,13 @@ public class ReservationClient {
         Main.FlightResponse flightResponse = flightStub.reserveFlight(flightRequest);
         System.out.println("Flight reservation: " + flightResponse);
 
+        Main.ListFlightsRequest listFlightRequest = Main.ListFlightsRequest.newBuilder()
+                .setUserId("user456")
+                .build();
+
+        Main.ListFlightsResponse listFlightsResponse = flightStub.listReservedFlights(listFlightRequest);
+        System.out.println("Flight reservation: " + listFlightsResponse);
+
         channel.shutdown();
     }
 }
