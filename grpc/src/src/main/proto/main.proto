@@ -60,7 +60,6 @@ message ListFlightsResponse {
 
 message FlightReservationInfo {
   string flight_id = 1;
-  string reservation_id = 2;
   string departure_date = 3;
   string return_date = 4;
   int32 number_of_tickets = 5;
