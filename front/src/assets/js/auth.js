@@ -13,15 +13,3 @@ function loadToken() {
     }
     return null;
 }
-
-// function fetchUserInfo(token) {
-//     fetch('http://localhost:8902/token', {
-//         headers: {
-//             'Authorization': `Bearer ${token}`
-//         }
-//     })
-//     .then(response => response.json())
-//     .then(userInfo => {
-//         document.getElementById('userInfo').innerText = JSON.stringify(userInfo, null, 2);
-//     });
-// }

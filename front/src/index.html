@@ -6,6 +6,7 @@
     <title>Google Login</title>
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="assets/css/auth.css">
+    <link rel="stylesheet" href="assets/css/loading.css">
 </head>
 <body>
     <header>
@@ -15,6 +16,28 @@
         </button>
     </header>
 
+    <div id="content">
+        <div class="card">
+            <h1>User information</h1>
+            <p id="userInfo">
+                <span class="loader"></span>
+            </p>
+        </div>
+        <div class="card">
+            <h1>Hotels</h1>
+            <p>
+                <span class="loader"></span>
+            </p>
+        </div>
+        <div class="card">
+            <h1>Flights</h1>
+            <p>
+                <span class="loader"></span>
+            </p>
+        </div>
+    </div>
+
     <script src="assets/js/auth.js"></script>
+    <script src="assets/js/user.js"></script>
 </body>
 </html>
