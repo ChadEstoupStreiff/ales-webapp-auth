@@ -3,11 +3,10 @@ package infres.ws.grpc;
 import com.google.type.DateTime;
 import reservation.Main;
 
+import java.time.Instant;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Manager {
 
@@ -18,6 +17,16 @@ public class Manager {
             instance = new Manager();
         }
         return instance;
+    }
+
+    private static Date generateRandomFutureDate() {
+        Instant now = Instant.now();
+
+        long maxDaysInFuture = 365;
+        long randomDaysToAdd = ThreadLocalRandom.current().nextLong(1, maxDaysInFuture + 1);
+
+        Instant randomFutureInstant = now.plusSeconds(randomDaysToAdd * 24 * 60 * 60);
+        return Date.from(randomFutureInstant);
     }
 
     private ArrayList<Main.FlightReservationInfo> flights = new ArrayList<>();
@@ -31,8 +40,9 @@ public class Manager {
         if (flights.stream().noneMatch(f -> f.getFlightId().equals(flight))) {
             flights.add(Main.FlightReservationInfo.newBuilder()
                             .setFlightId(flight)
-                            .setDepartureDate(LocalDate.now().toString())
-                            .setNumberOfTickets(3)
+                            .setDepartureDate(generateRandomFutureDate().toString())
+                            .setReturnDate(generateRandomFutureDate().toString())
+                            .setNumberOfTickets(new Random().nextInt(1, 6))
                     .build());
         }
 
@@ -50,9 +60,9 @@ public class Manager {
         if (hotels.stream().noneMatch(f -> f.getHotelId().equals(hotel))) {
             hotels.add(Main.HotelReservationInfo.newBuilder()
                     .setHotelId(hotel)
-                    .setCheckInDate(LocalDate.now().toString())
-                    .setCheckOutDate(LocalDate.now().toString())
-                    .setNumberOfRooms(3)
+                    .setCheckInDate(generateRandomFutureDate().toString())
+                    .setCheckOutDate(generateRandomFutureDate().toString())
+                    .setNumberOfRooms(new Random().nextInt(1, 6))
                     .build());
         }
 
