@@ -84,12 +84,12 @@ KEYCLOAK_REDIRECT_URI = "http://localhost:8901/auth/keycloak"
 @app.get("/login/keycloak", tags=["Keycloak"])
 async def login_keycloak():
     return {
-        "url": f"{KEYCLOAK_SERVER_URL}/realms/{KEYCLOAK_REALM}/protocol/openid-connect/auth?response_type=code&client_id={KEYCLOAK_CLIENT_ID}&redirect_uri={KEYCLOAK_REDIRECT_URI}&scope=openid%20profile%20email"
+        "url": f"http://localhost:8900/realms/{KEYCLOAK_REALM}/protocol/openid-connect/auth?response_type=code&client_id={KEYCLOAK_CLIENT_ID}&redirect_uri={KEYCLOAK_REDIRECT_URI}&scope=openid%20profile%20email"
     }
 
 @app.get("/auth/keycloak", tags=["Keycloak"])
 async def auth_keycloak(code: str):
-    token_url = f"http://keycloak:8080/realms/{KEYCLOAK_REALM}/protocol/openid-connect/token"
+    token_url = f"{KEYCLOAK_SERVER_URL}/realms/{KEYCLOAK_REALM}/protocol/openid-connect/token"
     data = {
         "code": code,
         "client_id": KEYCLOAK_CLIENT_ID,
@@ -100,15 +100,13 @@ async def auth_keycloak(code: str):
     response = requests.post(token_url, data=data)
     response_data = response.json()
     access_token = response_data.get("access_token")
-    logging.critical(access_token)
     if not access_token:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
 
     user_info = requests.get(
-        f"http://keycloak:8080/realms/{KEYCLOAK_REALM}/protocol/openid-connect/userinfo",
+        f"{KEYCLOAK_SERVER_URL}/realms/{KEYCLOAK_REALM}/protocol/openid-connect/userinfo",
         headers={"Authorization": f"Bearer {access_token}"},
     )
-    logging.critical(user_info)
     user_info = user_info.json()
 
     token = jwt.encode(
