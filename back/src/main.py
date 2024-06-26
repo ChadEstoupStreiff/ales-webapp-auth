@@ -25,24 +25,24 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 config = dotenv_values("/.env")
 
+JWT_SECRET = config["JWT_SECRET"]
+JWT_ALGORITHM = config["JWT_ALGORITHM"]
 ###############################
 #        Google Auth          #
-###############################]
+###############################
 GOOGLE_CLIENT_ID = config["GOOGLE_CLIENT_ID"]
 GOOGLE_CLIENT_SECRET = config["GOOGLE_CLIENT_SECRET"]
-GOOGLE_REDIRECT_URI = "http://localhost:8901/auth"
-JWT_SECRET = config["JWT_SECRET"]
-JWT_ALGORITHM = "HS256"
+GOOGLE_REDIRECT_URI = "http://localhost:8901/auth/google"
 
 
-@app.get("/login/google")
+@app.get("/login/google", tags=["Google"])
 async def login_google():
     return {
         "url": f"https://accounts.google.com/o/oauth2/auth?response_type=code&client_id={GOOGLE_CLIENT_ID}&redirect_uri={GOOGLE_REDIRECT_URI}&scope=openid%20profile%20email&access_type=offline"
     }
 
 
-@app.get("/auth/google")
+@app.get("/auth/google", tags=["Google"])
 async def auth_google(code: str):
     token_url = "https://accounts.google.com/o/oauth2/token"
     data = {
@@ -72,8 +72,63 @@ async def auth_google(code: str):
     )
     return {"access_token": token, "token_type": "bearer"}
 
+###############################
+#          KEYCLOAK           #
+###############################
+KEYCLOAK_SERVER_URL = config["KEYCLOAK_SERVER_URL"]
+KEYCLOAK_REALM = config["KEYCLOAK_REALM"]
+KEYCLOAK_CLIENT_ID = config["KEYCLOAK_CLIENT_ID"]
+KEYCLOAK_CLIENT_SECRET = config["KEYCLOAK_CLIENT_SECRET"]
+KEYCLOAK_REDIRECT_URI = "http://localhost:8901/auth/keycloak"
 
-@app.get("/token")
+@app.get("/login/keycloak", tags=["Keycloak"])
+async def login_keycloak():
+    return {
+        "url": f"{KEYCLOAK_SERVER_URL}/realms/{KEYCLOAK_REALM}/protocol/openid-connect/auth?response_type=code&client_id={KEYCLOAK_CLIENT_ID}&redirect_uri={KEYCLOAK_REDIRECT_URI}&scope=openid%20profile%20email"
+    }
+
+@app.get("/auth/keycloak", tags=["Keycloak"])
+async def auth_keycloak(code: str):
+    token_url = f"http://keycloak:8080/realms/{KEYCLOAK_REALM}/protocol/openid-connect/token"
+    data = {
+        "code": code,
+        "client_id": KEYCLOAK_CLIENT_ID,
+        "client_secret": KEYCLOAK_CLIENT_SECRET,
+        "redirect_uri": KEYCLOAK_REDIRECT_URI,
+        "grant_type": "authorization_code",
+    }
+    response = requests.post(token_url, data=data)
+    response_data = response.json()
+    access_token = response_data.get("access_token")
+    logging.critical(access_token)
+    if not access_token:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+
+    user_info = requests.get(
+        f"http://keycloak:8080/realms/{KEYCLOAK_REALM}/protocol/openid-connect/userinfo",
+        headers={"Authorization": f"Bearer {access_token}"},
+    )
+    logging.critical(user_info)
+    user_info = user_info.json()
+
+    token = jwt.encode(
+        {
+            "sub": user_info["sub"],
+            "name": user_info["name"],
+            "email": user_info["email"],
+            "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1),
+        },
+        JWT_SECRET,
+        algorithm=JWT_ALGORITHM,
+    )
+    return {"access_token": token, "token_type": "bearer"}
+
+
+###############################
+#            Auth             #
+###############################
+
+@app.get("/token", tags=["User"])
 async def get_token(token: str = Depends(oauth2_scheme)):
     try:
         payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])

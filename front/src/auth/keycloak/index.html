@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keycloak Login</title>
+    <link rel="stylesheet" href="../../assets/css/loading.css">
+    <script>
+        window.addEventListener('load', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('code');
+
+            if (code) {
+                fetch(`http://localhost:8902/auth/keycloak?code=${code}`)
+                    .then(response => response.json())
+                    .then(userInfo => {
+                        saveToken(userInfo.access_token);
+                        window.location.href = "/";
+                    });
+            } else {
+                const token = loadToken();
+                if (token) {
+                    fetchUserInfo(token);
+                }
+            }
+        });
+
+        function saveToken(token) {
+            document.cookie = `token=${token}; path=/; max-age=3600;`;
+        }
+    </script>
+</head>
+<body>
+    <div style="display: flex; justify-content: center; align-items: center; width: 100vw; height: 100vh;">
+        <span class="loader"></span>
+    </div>
+</body>
+</html>
